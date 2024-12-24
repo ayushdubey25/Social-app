@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 export const signup = async (req, res) => {
   try {
     const { fullname, username, email, password } = req.body;
-
+    console.log("Request Body:", req.body);
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ error: "Username is already taken" });
@@ -46,7 +46,7 @@ export const signup = async (req, res) => {
         fullname: newuser.fullname,
         username: newuser.username,
         email: newuser.email,
-        followers: newuser.followers,
+        followers: newuser.follower,
         following: newuser.following,
         profileImg: newuser.profileImg,
         coverImg: newuser.coverImg,
