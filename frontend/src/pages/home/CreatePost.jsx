@@ -96,7 +96,6 @@ const CreatePost = () => {
             />
           </div>
         )}
-
         <div className="flex justify-between border-t py-2 border-t-gray-700">
           <div className="flex gap-1 items-center">
             <CiImageOn
@@ -116,8 +115,12 @@ const CreatePost = () => {
             {isPending ? "Posting..." : "Post"}
           </button>
         </div>
-        {isError && <div className="text-red-500">Something went wrong</div>}
-        {error.message}
+        {isError && (
+          <div className="text-red-500">
+            Something went wrong
+            {error.message}
+          </div>
+        )}
       </form>
     </div>
   );
