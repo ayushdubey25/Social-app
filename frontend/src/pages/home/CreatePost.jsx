@@ -39,17 +39,10 @@ const CreatePost = () => {
     onSuccess: () => {
       setText("");
       setImg(null);
-      toast.success("Post created successfully");
+      toast.success("Signal transmitted successfully!");
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
-
-  //const isPending = false;
-  //const isError = false;
-
-  const data = {
-    profileImg: "/avatars/boy1.png",
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -68,41 +61,50 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="flex p-4 items-start gap-4 border-b border-gray-700">
+    <div className="flex p-4 items-start gap-4 border-b border-blue-800/50 relative z-10 backdrop-blur-sm bg-gray-900/80">
       <div className="avatar">
-        <div className="w-8 rounded-full">
-          <img src={authUser.profileImg || "/avatar-placeholder.png"} />
+        <div className="w-10 rounded-full border-2 border-blue-500/50 hover:border-blue-400 transition-all duration-300">
+          <img src={authUser?.profileImg || "/avatar-placeholder.png"} />
         </div>
       </div>
       <form className="flex flex-col gap-2 w-full" onSubmit={handleSubmit}>
         <textarea
-          className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800"
-          placeholder="Emit Your Signal!"
+          className="textarea w-full p-0 text-lg resize-none border-none focus:outline-none bg-transparent text-blue-100 placeholder-blue-400/60"
+          placeholder="Transmit your signal..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          rows="3"
         />
         {img && (
-          <div className="relative w-72 mx-auto">
-            <IoCloseSharp
-              className="absolute top-0 right-0 text-white bg-gray-800 rounded-full w-5 h-5 cursor-pointer"
-              onClick={() => {
-                setImg(null);
-                imgRef.current.value = null;
-              }}
-            />
+          <div className="relative w-full max-w-2xl mx-auto border border-blue-500/30 rounded-lg overflow-hidden">
+            <div className="absolute top-2 right-2 bg-gray-900/80 rounded-full p-1">
+              <IoCloseSharp
+                className="text-blue-300 hover:text-blue-100 w-5 h-5 cursor-pointer transition-colors"
+                onClick={() => {
+                  setImg(null);
+                  imgRef.current.value = null;
+                }}
+              />
+            </div>
             <img
               src={img}
-              className="w-full mx-auto h-72 object-contain rounded"
+              className="w-full mx-auto max-h-80 object-contain rounded bg-gray-800/50"
             />
           </div>
         )}
-        <div className="flex justify-between border-t py-2 border-t-gray-700">
-          <div className="flex gap-1 items-center">
-            <CiImageOn
-              className="fill-primary w-6 h-6 cursor-pointer"
+        <div className="flex justify-between border-t py-3 border-t-blue-800/50">
+          <div className="flex gap-4 items-center">
+            <div
+              className="p-2 rounded-full hover:bg-blue-900/30 transition-all duration-300 cursor-pointer group relative"
               onClick={() => imgRef.current.click()}
-            />
-            <BsEmojiSmileFill className="fill-primary w-5 h-5 cursor-pointer" />
+            >
+              <CiImageOn className="text-blue-400 w-6 h-6 group-hover:text-blue-300 transition-colors" />
+              <div className="absolute inset-0 rounded-full border border-blue-500/30 group-hover:border-blue-400/50 transition-all duration-300 pointer-events-none"></div>
+            </div>
+            <div className="p-2 rounded-full hover:bg-blue-900/30 transition-all duration-300 cursor-pointer group relative">
+              <BsEmojiSmileFill className="text-blue-400 w-5 h-5 group-hover:text-blue-300 transition-colors" />
+              <div className="absolute inset-0 rounded-full border border-blue-500/30 group-hover:border-blue-400/50 transition-all duration-300 pointer-events-none"></div>
+            </div>
           </div>
           <input
             type="file"
@@ -111,18 +113,35 @@ const CreatePost = () => {
             ref={imgRef}
             onChange={handleImgChange}
           />
-          <button className="btn btn-primary rounded-full btn-sm text-white px-4">
-            {isPending ? "Posting..." : "Post"}
+          <button
+            className={`btn rounded-full px-6 font-medium text-white ${
+              isPending
+                ? "bg-blue-900/50 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-500"
+            } transition-all duration-300 relative overflow-hidden`}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <>
+                <span className="relative z-10">Transmitting...</span>
+                <span className="absolute inset-0 bg-blue-500/30 animate-pulse"></span>
+              </>
+            ) : (
+              <>
+                <span className="relative z-10">Transmit</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></span>
+              </>
+            )}
           </button>
         </div>
         {isError && (
-          <div className="text-red-500">
-            Something went wrong
-            {error.message}
+          <div className="text-red-400 bg-red-900/30 px-4 py-2 rounded-lg border border-red-800/50">
+            Transmission failed: {error.message}
           </div>
         )}
       </form>
     </div>
   );
 };
+
 export default CreatePost;

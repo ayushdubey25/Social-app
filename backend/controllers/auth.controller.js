@@ -39,8 +39,12 @@ export const signup = async (req, res) => {
     });
 
     if (newuser) {
-      generateTokenAndSetCookies(newuser._id, res);
+      console.log("🧪 About to save user:", newuser);
+
       await newuser.save();
+      console.log("✅ User saved successfully:", newuser);
+      generateTokenAndSetCookies(newuser._id, res);
+
       res.status(201).json({
         _id: newuser._id,
         fullname: newuser.fullname,

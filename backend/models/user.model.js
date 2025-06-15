@@ -21,6 +21,18 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    timetable: {
+      type: Object,
+      default: {
+        monday: [{ start: String, end: String }],
+        tuesday: [{ start: String, end: String }],
+        wednesday: [{ start: String, end: String }],
+        thursday: [{ start: String, end: String }],
+        friday: [{ start: String, end: String }],
+        saturday: [{ start: String, end: String }],
+        sunday: [{ start: String, end: String }],
+      },
+    },
     follower: [
       {
         type: mongoose.Schema.Types.ObjectId, //16 characters
@@ -35,7 +47,6 @@ const userSchema = new mongoose.Schema(
         default: [],
       },
     ],
-
     profileImg: {
       type: String,
       default: "",

@@ -1,109 +1,174 @@
-import XSvg from "../svgs/X";
-
+import { useEffect, useRef, useState } from "react";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 import toast from "react-hot-toast";
+import XSvg from "../svgs/X";
+import { useNotifications } from "../../hooks/useNotification";
 
 const Sidebar = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const previousUnreadCount = useRef(0);
+  const hasMounted = useRef(false);
+  //
+  const { unseenCount } = useNotifications();
+
+  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+
+  /*const { data: notifications } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/notifications");
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || "Failed to fetch notifications");
+      return data;
+    },
+    refetchInterval: 3000,
+    onSuccess: (data) => {
+      const currentUnread = data?.filter((n) => !n.read)?.length || 0;
+
+      // Update the unread count state
+      setUnreadCount(currentUnread);
+
+      // Only show toast if:
+      // 1. The component has mounted
+      // 2. There are new unread notifications
+      // 3. The count has actually increased (not just changed)
+      if (hasMounted.current && currentUnread > previousUnreadCount.current) {
+        toast.success("🔔 You have a new Signal Alert!", {
+          duration: 5000,
+          style: {
+            background: "#1e3a8a",
+            color: "#fff",
+            fontWeight: "bold",
+          },
+        });
+      }
+
+      // Update the previous count reference
+      previousUnreadCount.current = currentUnread;
+      hasMounted.current = true;
+    },
+  });*/
+
   const { mutate: logout } = useMutation({
     mutationFn: async () => {
-      try {
-        const res = await fetch("/api/auth/logout", {
-          method: "POST",
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
-        }
-      } catch (error) {
-        throw new Error(error);
-      }
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
       navigate("/login");
-      toast.success("Logged out successfully");
+      toast.success("Circuit disconnected successfully");
     },
     onError: () => {
-      toast.error("Logout failed");
-      toast.error("Logout failed");
+      toast.error("Disconnection failed");
     },
   });
 
-  const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-
   return (
     <div className="md:flex-[2_2_0] w-18 max-w-52">
-      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full">
-        <Link to="/" className="flex justify-center md:justify-start">
-          <XSvg className="px-2 w-12 h-12 rounded-full fill-white hover:bg-stone-900" />
+      {/* Sidebar UI */}
+      <div className="sticky top-0 left-0 h-screen flex flex-col border-r border-blue-800/50 w-20 md:w-full bg-gray-900/80 backdrop-blur-sm">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex justify-center md:justify-start p-4 group relative overflow-hidden"
+        >
+          <div className="w-10 h-10 flex items-center justify-center">
+            <XSvg className="w-full h-full text-blue-400 group-hover:text-blue-300 transition-colors duration-300" />
+          </div>
+          <span className="hidden md:block text-xl font-bold text-blue-400 ml-2">
+            CIRCUIT
+          </span>
         </Link>
-        <ul className="flex flex-col gap-3 mt-4">
+
+        {/* Navigation Links */}
+        <ul className="flex flex-col gap-2 mt-8 px-2">
           <li className="flex justify-center md:justify-start">
             <Link
               to="/"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-blue-900/30 transition-all rounded-full duration-300 p-3 md:pl-4 md:pr-6 max-w-fit cursor-pointer group relative"
             >
-              <MdHomeFilled className="w-8 h-8" />
-              <span className="text-lg hidden md:block">Junction</span>
+              <MdHomeFilled className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
+              <span className="text-lg hidden md:block text-blue-200 group-hover:text-blue-100">
+                Junction
+              </span>
             </Link>
           </li>
           <li className="flex justify-center md:justify-start">
             <Link
               to="/notifications"
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-blue-900/30 transition-all rounded-full duration-300 p-3 md:pl-4 md:pr-6 max-w-fit cursor-pointer group relative"
             >
-              <IoNotifications className="w-6 h-6" />
-              <span className="text-lg hidden md:block">Signal Alerts</span>
+              <div className="relative">
+                <IoNotifications className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
+                {unseenCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] min-w-[16px] h-[16px] px-[4px] rounded-full flex items-center justify-center border-2 border-gray-900 font-semibold">
+                    {unseenCount > 9 ? "9+" : unseenCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-lg hidden md:block text-blue-200 group-hover:text-blue-100">
+                Signal Alerts
+              </span>
             </Link>
           </li>
-
           <li className="flex justify-center md:justify-start">
             <Link
               to={`/profile/${authUser?.username}`}
-              className="flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer"
+              className="flex gap-3 items-center hover:bg-blue-900/30 transition-all rounded-full duration-300 p-3 md:pl-4 md:pr-6 max-w-fit cursor-pointer group relative"
             >
-              <FaUser className="w-6 h-6" />
-              <span className="text-lg hidden md:block">Your Circuit</span>
+              <FaUser className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
+              <span className="text-lg hidden md:block text-blue-200 group-hover:text-blue-100">
+                Your Circuit
+              </span>
             </Link>
           </li>
         </ul>
+
+        {/* Profile Section */}
         {authUser && (
-          <Link
-            to={`/profile/${authUser.username}`}
-            className="mt-auto mb-10 flex gap-2 items-start transition-all duration-300 hover:bg-[#181818] py-2 px-4 rounded-full"
-          >
-            <div className="avatar hidden md:inline-flex">
-              <div className="w-8 rounded-full">
-                <img src={authUser?.profileImg || "/avatar-placeholder.png"} />
+          <div className="mt-auto mb-4 mx-2">
+            <div className="flex gap-2 items-center transition-all duration-300 hover:bg-blue-900/30 py-2 px-3 rounded-full group cursor-pointer relative">
+              <div className="avatar hidden md:inline-flex">
+                <div className="w-8 rounded-full border-2 border-blue-500/50 group-hover:border-blue-400/70 transition-colors duration-300">
+                  <img
+                    src={authUser?.profileImg || "/avatar-placeholder.png"}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-between flex-1 items-center">
+                <div className="hidden md:block">
+                  <p className="text-blue-100 font-bold text-sm w-20 truncate">
+                    {authUser?.fullname}
+                  </p>
+                  <p className="text-blue-400/70 text-sm">
+                    @{authUser?.username}
+                  </p>
+                </div>
+                <div className="p-2 rounded-full hover:bg-blue-800/30 transition-colors duration-300">
+                  <BiLogOut
+                    className="w-5 h-5 text-blue-400 hover:text-blue-300 cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      logout();
+                    }}
+                  />
+                </div>
               </div>
             </div>
-            <div className="flex justify-between flex-1">
-              <div className="hidden md:block">
-                <p className="text-white font-bold text-sm w-20 truncate">
-                  {authUser?.fullname}
-                </p>
-                <p className="text-slate-500 text-sm">@{authUser?.username}</p>
-              </div>
-              <BiLogOut
-                className="w-5 h-5 cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  logout();
-                }}
-              />
-            </div>
-          </Link>
+          </div>
         )}
       </div>
     </div>
   );
 };
+
 export default Sidebar;
