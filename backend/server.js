@@ -49,7 +49,7 @@ const io = new Server(server, {
     origin: [
       "http://localhost:3000",
       "https://social-circuit.netlify.app",
-      "https://social-circuit.vercel.app",
+      "https://social-circuit-rho.vercel.app",
     ],
     credentials: true,
   },
