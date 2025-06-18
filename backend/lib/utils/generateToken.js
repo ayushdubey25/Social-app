@@ -6,10 +6,8 @@ export const generateTokenAndSetCookies = (userId, res) => {
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // true on deploy
-    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-
-    secure: process.env.NODE_ENV !== "development",
+    secure: true, // ✅ critical: Render uses HTTPS
+    sameSite: "None", // ✅ cross-origin cookie sharing
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   });
 };
