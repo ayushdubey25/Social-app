@@ -94,7 +94,10 @@ const ProfilePage = () => {
       if (!user?._id) return;
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/timetable/${user?._id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/timetable/${user?._id}`,
+          {
+            credentials: "include",
+          }
         );
         const data = await res.json();
 
@@ -149,7 +152,10 @@ const ProfilePage = () => {
         const res = await fetch(
           `${import.meta.env.VITE_BACKEND_URL}/api/users/followers/${
             authUser._id
-          }`
+          }`,
+          {
+            credentials: "include",
+          }
         );
         const data = await res.json();
         if (!Array.isArray(data)) return;
