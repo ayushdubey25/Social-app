@@ -10,7 +10,9 @@ const RightPanel = () => {
     queryKey: ["suggestedUsers"],
     queryFn: async () => {
       try {
-        const res = await fetch("/api/users/suggested");
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/suggested`
+        );
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.message || "Signal transmission failed");

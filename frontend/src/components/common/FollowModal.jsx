@@ -10,7 +10,9 @@ const FollowModal = ({ userId, type, onClose }) => {
     queryKey: [`${type}`, userId],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/users/${userId}/${type}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/${userId}/${type}`
+        );
         if (!res.ok) {
           // Handle specific HTTP errors
           if (res.status === 404) {

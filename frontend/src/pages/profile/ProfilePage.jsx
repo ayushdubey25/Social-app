@@ -45,7 +45,9 @@ const ProfilePage = () => {
     queryKey: ["userProfile"],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/users/profile/${username}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/profile/${username}`
+        );
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error || "Something went wrong");
@@ -88,7 +90,9 @@ const ProfilePage = () => {
     const fetchTimetable = async () => {
       if (!user?._id) return;
       try {
-        const res = await fetch(`/api/timetable/${user?._id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/timetable/${user?._id}`
+        );
         const data = await res.json();
 
         if (res.ok) {
@@ -139,7 +143,11 @@ const ProfilePage = () => {
 
     const pollFollowers = async () => {
       try {
-        const res = await fetch(`/api/users/followers/${authUser._id}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/followers/${
+            authUser._id
+          }`
+        );
         const data = await res.json();
         if (!Array.isArray(data)) return;
 
@@ -220,16 +228,19 @@ const ProfilePage = () => {
       };
       setUserTimetable(updatedTimetable);
 
-      const res = await fetch(`/api/timetable/remove-slot`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          userId: user._id,
-          day,
-          slot: slotToRemove,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/timetable/remove-slot`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            userId: user._id,
+            day,
+            slot: slotToRemove,
+          }),
+        }
+      );
 
       const data = await res.json();
 
@@ -271,14 +282,18 @@ const ProfilePage = () => {
         [day]: [...(userTimetable[day] || []), newTimeSlot],
       };
 
-      const res = await fetch(`/api/timetable`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: user._id,
-          timetable: updatedTimetable,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/timetable`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: user._id,
+            timetable: updatedTimetable,
+          }),
+        }
+      );
 
       if (res.ok) {
         setUserTimetable(updatedTimetable);

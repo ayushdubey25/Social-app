@@ -12,7 +12,9 @@ export const useNotifications = () => {
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],
     queryFn: async () => {
-      const res = await fetch("/api/notifications");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/notifications`
+      );
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.error || "Failed to fetch notifications");

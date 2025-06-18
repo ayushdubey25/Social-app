@@ -23,7 +23,9 @@ const ChatRoom = ({ currentUserId, otherUserId, conversationId }) => {
     const fetchMessages = async () => {
       if (!roomId) return;
       try {
-        const res = await fetch(`/api/messages/${roomId}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/messages/${roomId}`
+        );
         if (res.ok) {
           const data = await res.json();
           setChat(data);

@@ -12,7 +12,9 @@ const ChatPage = () => {
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
-      const res = await fetch("/api/auth/me");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`
+      );
       const data = await res.json();
       if (data.error) return null;
       return data;

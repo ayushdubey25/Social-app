@@ -20,13 +20,17 @@ const CreatePost = () => {
   } = useMutation({
     mutationFn: async ({ text, img }) => {
       try {
-        const res = await fetch("/api/posts/create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ text, img }),
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/create`,
+          {
+            credentials: "include",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text, img }),
+          }
+        );
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error || "Something went wrong");

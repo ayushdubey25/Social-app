@@ -21,9 +21,12 @@ const Post = ({ post }) => {
   const { mutate: deletePost, isPending: isDeleting } = useMutation({
     mutationFn: async () => {
       try {
-        const res = await fetch(`/api/posts/${post._id}`, {
-          method: "DELETE",
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/${post._id}`,
+          {
+            method: "DELETE",
+          }
+        );
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data.error || "Something went wrong");
