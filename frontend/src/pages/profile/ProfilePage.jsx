@@ -46,7 +46,10 @@ const ProfilePage = () => {
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/users/profile/${username}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/users/profile/${username}`,
+          {
+            credentials: "include",
+          }
         );
         const data = await res.json();
         if (!res.ok) {

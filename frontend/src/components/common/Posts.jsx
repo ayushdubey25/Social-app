@@ -5,31 +5,38 @@ import { useEffect } from "react";
 
 const Posts = ({ feedType, username, userId }) => {
   const getPostEndpoint = () => {
+    const BASE = import.meta.env.VITE_BACKEND_URL;
+
     switch (feedType) {
       case "forYou":
-        return (
-          `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`,
-          {
-            credentials: "include",
-          }
-        );
+        return {
+          url: `${BASE}/api/posts/all`,
+          options: { credentials: "include" },
+        };
       case "following":
-        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/following`;
+        return {
+          url: `${BASE}/api/posts/following`,
+          options: { credentials: "include" },
+        };
       case "posts":
-        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/user/${username}`;
+        return {
+          url: `${BASE}/api/posts/user/${username}`,
+          options: { credentials: "include" },
+        };
       case "likes":
-        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/likes/${userId}`;
+        return {
+          url: `${BASE}/api/posts/likes/${userId}`,
+          options: { credentials: "include" },
+        };
       default:
-        return (
-          `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`,
-          {
-            credentials: "include",
-          }
-        );
+        return {
+          url: `${BASE}/api/posts/all`,
+          options: { credentials: "include" },
+        };
     }
   };
 
-  const POST_ENDPOINT = getPostEndpoint();
+  const { url, options } = getPostEndpoint();
 
   const {
     data: posts,
@@ -37,10 +44,10 @@ const Posts = ({ feedType, username, userId }) => {
     refetch,
     isRefetching,
   } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", feedType, username],
     queryFn: async () => {
       try {
-        const res = await fetch(POST_ENDPOINT);
+        const res = await fetch(url, options);
         const data = await res.json();
 
         if (!res.ok) {
@@ -49,7 +56,7 @@ const Posts = ({ feedType, username, userId }) => {
 
         return data;
       } catch (error) {
-        throw new Error(error);
+        throw new Error(error.message || "Fetch failed");
       }
     },
   });
