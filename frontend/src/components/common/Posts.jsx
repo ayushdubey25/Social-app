@@ -7,7 +7,12 @@ const Posts = ({ feedType, username, userId }) => {
   const getPostEndpoint = () => {
     switch (feedType) {
       case "forYou":
-        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`;
+        return (
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`,
+          {
+            credentials: "include",
+          }
+        );
       case "following":
         return `${import.meta.env.VITE_BACKEND_URL}/api/posts/following`;
       case "posts":
@@ -15,7 +20,12 @@ const Posts = ({ feedType, username, userId }) => {
       case "likes":
         return `${import.meta.env.VITE_BACKEND_URL}/api/posts/likes/${userId}`;
       default:
-        return `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`;
+        return (
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/all`,
+          {
+            credentials: "include",
+          }
+        );
     }
   };
 
