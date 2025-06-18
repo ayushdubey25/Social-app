@@ -25,6 +25,7 @@ const Post = ({ post }) => {
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${post._id}`,
           {
             method: "DELETE",
+            credentials: "include",
           }
         );
         const data = await res.json();

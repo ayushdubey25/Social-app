@@ -13,7 +13,10 @@ const ChatPage = () => {
     queryKey: ["authUser"],
     queryFn: async () => {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
+        {
+          credentials: "include",
+        }
       );
       const data = await res.json();
       if (data.error) return null;

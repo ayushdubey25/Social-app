@@ -24,7 +24,10 @@ const ChatRoom = ({ currentUserId, otherUserId, conversationId }) => {
       if (!roomId) return;
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/messages/${roomId}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/messages/${roomId}`,
+          {
+            credentials: "include",
+          }
         );
         if (res.ok) {
           const data = await res.json();

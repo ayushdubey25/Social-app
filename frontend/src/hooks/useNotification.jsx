@@ -13,7 +13,10 @@ export const useNotifications = () => {
     queryKey: ["notifications"],
     queryFn: async () => {
       const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/notifications`
+        `${import.meta.env.VITE_BACKEND_URL}/api/notifications`,
+        {
+          credentials: "include",
+        }
       );
       const data = await res.json();
       if (!res.ok)
