@@ -143,13 +143,16 @@ const SignUpPage = () => {
   const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async (formData) => {
       try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData), // Use the whole formData object
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/signup`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData), // Use the whole formData object
+          }
+        );
         const data = await res.json();
 
         if (data.error) throw new Error(data.error);

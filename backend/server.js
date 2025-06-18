@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+import cors from "cors";
 
 import express from "express";
 import http from "http"; // Import Node's http module
@@ -22,6 +23,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const cors = require("cors");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -34,6 +37,12 @@ const io = new Server(server, {
     origin: "*", // Allow all origins (adjust as needed)
   },
 });
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://social-circuit.netlify.app"], // update as needed
+    credentials: true,
+  })
+);
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
