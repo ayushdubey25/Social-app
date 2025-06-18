@@ -5,10 +5,10 @@ export const generateTokenAndSetCookies = (userId, res) => {
   });
 
   res.cookie("jwt", token, {
-    maxAge: 15 * 24 * 60 * 60 * 1000, //milliseconds
-    httpOnly: true, //prevent XSS attacks cross-site scripting attacks
-    sameSite: "None", //CSRF attacks cross-site request forgery attacks
-    secure: true, // ✅ Required for HTTPS (Render)
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // true on deploy
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+    maxAge: 1000 * 60 * 60 * 24 * 7,
 
     secure: process.env.NODE_ENV !== "development",
   });
