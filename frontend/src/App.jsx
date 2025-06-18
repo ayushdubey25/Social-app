@@ -21,8 +21,12 @@ function App() {
     queryFn: async () => {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
+          {
+            credentials: "include", // ✅ critical: send cookie for JWT
+          }
         );
+
         const data = await res.json();
         if (data.error) return null;
         if (!res.ok) throw new Error(data.error || "Connection error");
