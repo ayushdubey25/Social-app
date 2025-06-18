@@ -1,22 +1,23 @@
 import dotenv from "dotenv";
 dotenv.config();
-import cors from "cors";
 
 import express from "express";
-import http from "http"; // Import Node's http module
-import { Server } from "socket.io"; // Import Socket.IO's Server class
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
+import connectMongoDB from "./db/connectMongoDB.js";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
-import timetableRoutes from "./routes/timetable.route.js"; // Import the timetable routes
-
-import connectMongoDB from "./db/connectMongoDB.js";
-import cookieParser from "cookie-parser";
-import { v2 as cloudinary } from "cloudinary";
+import timetableRoutes from "./routes/timetable.route.js";
 import conversationRoutes from "./routes/conversation.route.js";
 import messageRoutes from "./routes/message.route.js";
+import { v2 as cloudinary } from "cloudinary";
 
+// Cloudinary config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -26,29 +27,39 @@ cloudinary.config({
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Create HTTP server using Express app
+// 🔧 CORS Middleware (Add before routes)
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://social-circuit.netlify.app"],
+    credentials: true,
+  })
+);
+
+// Other middleware
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Create HTTP server
 const server = http.createServer(app);
 
-// Initialize Socket.IO server on the HTTP server
+// Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://social-circuit.netlify.app"], // update as needed
-    credentials: true, // Allow all origins (adjust as needed)
+    origin: ["http://localhost:3000", "https://social-circuit.netlify.app"],
+    credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // Listen for joining a room (for private messaging)
   socket.on("joinRoom", (roomId) => {
     socket.join(roomId);
     console.log(`Socket ${socket.id} joined room: ${roomId}`);
   });
 
-  // Listen for sending a message
   socket.on("sendMessage", ({ roomId, message, sender }) => {
-    // Broadcast the message to other clients in the room
     socket.to(roomId).emit("receiveMessage", {
       message,
       sender,
@@ -56,37 +67,27 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Handle client disconnect
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
   });
 });
 
-// Middleware setup
-app.use(express.json({ limit: "5mb" })); // to parse req.body
-app.use(express.urlencoded({ extended: true })); // to parse form data(urlencoded)
-app.use(cookieParser());
-
-console.log(process.env.MONGO_URI);
-
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api/timetable", timetableRoutes); // Use the timetable routes
+app.use("/api/timetable", timetableRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/api/users", userRoutes);
 
+// Default route
 app.get("/", (req, res) => {
   res.send("Server is ready");
 });
 
-// Start the HTTP server (instead of app.listen)
-console.log("✅ MONGO_URI from .env:", process.env.MONGO_URI);
-
+// Start server
 server.listen(PORT, () => {
-  console.log(`Server is running on ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
   connectMongoDB();
 });
